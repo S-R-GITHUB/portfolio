@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="my.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <title>Portfolio Gallery</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom colors from your palette */
+    :root {
+      --primary: #0a192f;
+      --secondary: #172a45;
+      --accent: #d4af37;
+      --text-primary: #e6f1ff;
+      --text-secondary: #8892b0;
+      --sky: rgb(81, 85, 87);
+    }
+    :root.light-theme {
+      --primary: #f9f9f9;
+      --secondary: #ffffff;
+      --accent: #d4af37;
+      --text-primary: #1a1a1a;
+      --text-secondary: #555555;
+      --sky: skyblue;
+    }
+            /* ================= Preloader ================= */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a192f;
+            /* portfolio theme */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .preloader-content {
+            text-align: center;
+        }
+
+        /* ==== Logo with 3D Rotation + Pulse ==== */
+        .preloader-logo {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            border: 4px solid #d4af37;
+            padding: 8px;
+            animation: logoPulse 2s infinite ease-in-out, logoSpin 3s infinite linear;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+        }
+
+        @keyframes logoPulse {
+
+            0%,
+            100% {
+                transform: scale(1) rotateY(0deg);
+                box-shadow: 0 0 15px #d4af37;
+            }
+
+            50% {
+                transform: scale(1.1) rotateY(0deg);
+                box-shadow: 0 0 40px #d4af37;
+            }
+        }
+
+        @keyframes logoSpin {
+            0% {
+                transform: rotateY(0deg);
+            }
+
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        /* ==== Glowing Text with Shimmer ==== */
+        .preloader-text {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 20px;
+            background: linear-gradient(90deg, #d4af37, #fff, #d4af37);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shimmer 2s linear infinite;
+            letter-spacing: 4px;
+        }
+
+        @keyframes shimmer {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* ==== Wave Loader ==== */
+        .wave-loader {
+            display: flex;
+            justify-content: center;
+            margin-top: 25px;
+            gap: 8px;
+        }
+
+        .wave-loader span {
+            display: block;
+            width: 10px;
+            height: 40px;
+            background: #d4af37;
+            border-radius: 6px;
+            animation: wave 1.2s ease-in-out infinite;
+        }
+
+        .wave-loader span:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .wave-loader span:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .wave-loader span:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .wave-loader span:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .wave-loader span:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes wave {
+
+            0%,
+            100% {
+                transform: scaleY(0.3);
+            }
+
+            50% {
+                transform: scaleY(1.3);
+            }
+        }
+
+        /* ==== Exit Animation (Fade + Slide Up) ==== */
+        body.loaded #preloader .preloader-content {
+            transform: translateY(-50px);
+            opacity: 0;
+            transition: transform 1s ease, opacity 1s ease;
+        }
+
+        body.loaded #preloader {
+            pointer-events: none;
+            /* allow interaction with page */
+            transition: background 1s ease 0.3s;
+            background: transparent;
+        }
+
+
+
+
+        /* end preloder */
+
+    /* Apply CSS variables to Tailwind utility classes */
+    body {
+      background-color: var(--primary);
+      color: var(--text-primary);
+      transition: background-color 0.5s, color 0.5s;
+    }
+    nav, footer {
+      background-color: var(--secondary);
+      transition: background-color 0.5s;
+    }
+    a, button {
+      color: var(--accent);
+      transition: color 0.3s;
+    }
+    a:hover, button:hover {
+      color: var(--text-primary);
+    }
+
+    /* Gallery card 3D tilt effect */
+    .tilt {
+      perspective: 1000px;
+      cursor: pointer;
+    }
+    .tilt-inner {
+      transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-style: preserve-3d;
+      will-change: transform;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.4),
+                  0 8px 10px -6px rgb(0 0 0 / 0.3);
+      background-color: var(--secondary);
+    }
+    .tilt-inner img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      border-radius: 0.75rem;
+      pointer-events: none;
+      user-select: none;
+      filter: brightness(0.9);
+    }
+    
+    /* Hover states for different rotation directions */
+    .tilt-left:hover .tilt-inner {
+      transform: rotateY(15deg) rotateX(-8deg) translateZ(20px);
+    }
+    .tilt-right:hover .tilt-inner {
+      transform: rotateY(-15deg) rotateX(-8deg) translateZ(20px);
+    }
+    .tilt-left:hover .tilt-inner img,
+    .tilt-right:hover .tilt-inner img {
+      transform: scale(1.15);
+      filter: brightness(1.1);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Mobile menu animation */
+    #mobile-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    #mobile-menu.open {
+      max-height: 500px; /* enough to show all links */
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+        <!-- Preloader -->
+    <div id="preloader">
+        <div class="preloader-content">
+            <!-- <img src="my.png" alt="Logo" class="preloader-logo"> -->
+            <h1 class="preloader-text">SHANTANU RAUT</h1>
+            <div class="wave-loader">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 flex items-center justify-between px-6 py-4 shadow-md">
+    <a href="#" class="text-2xl font-bold tracking-wide" style="color: var(--accent)">MyGallery</a>
+
+    <!-- Desktop nav links -->
+    <ul class="hidden md:flex space-x-8 text-lg font-medium" style="color: var(--text-secondary)">
+      <li><a href="#gallery" class="hover:text-accent transition-colors">Gallery</a></li>
+      <li><a href="index.html#contact" class="hover:text-accent transition-colors">Contact</a></li>
+      <li><a href="index.html#home" class="hover:text-accent transition-colors">Home</a></li>
+    </ul>
+
+    <!-- Right controls: theme toggle and mobile menu button -->
+    <div class="flex items-center space-x-4">
+      <button id="theme-toggle" aria-label="Toggle Theme" class="text-xl focus:outline-none" style="color: var(--accent)">
+        🌙
+      </button>
+
+      <!-- Mobile menu button -->
+      <button id="mobile-menu-button" aria-label="Toggle Menu" aria-expanded="false" aria-controls="mobile-menu" class="md:hidden text-3xl focus:outline-none" style="color: var(--accent)">
+        &#9776;
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu (hidden on md and up) -->
+  <div id="mobile-menu" class="md:hidden bg-[var(--secondary)] text-[var(--accent)] px-6 overflow-hidden">
+    <ul class="flex flex-col space-y-4 py-4 text-lg font-medium">
+      <li><a href="#gallery" class="block hover:text-[var(--text-primary)] transition-colors" tabindex="0">Gallery</a></li>
+      <li><a href="#about" class="block hover:text-[var(--text-primary)] transition-colors" tabindex="0">About</a></li>
+      <li><a href="#contact" class="block hover:text-[var(--text-primary)] transition-colors" tabindex="0">Contact</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-4 py-12 max-w-7xl">
+    <h2 id="gallery" class="text-4xl font-extrabold mb-10 text-center" style="color: var(--accent)">
+      Lovely Memories
+    </h2>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <!-- Gallery items with alternating rotation directions -->
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 1">
+        <div class="tilt-inner">
+          <img src="pic/p17.jpg" alt="Nature Water" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 2">
+        <div class="tilt-inner">
+          <img src="pic/p3.jpg" alt="City Night" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 3">
+        <div class="tilt-inner">
+          <img src="pic/p10.jpg" alt="Mountains" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 4">
+        <div class="tilt-inner">
+          <img src="pic/p2.jpg" alt="Forest" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 5">
+        <div class="tilt-inner">
+          <img src="pic/p18.webp" alt="Beach" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 6">
+        <div class="tilt-inner">
+          <img src="pic/p6.jpg" alt="Architecture" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 7">
+        <div class="tilt-inner">
+          <img src="pic/p24.jpg" alt="Desert" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 8">
+        <div class="tilt-inner">
+          <img src="pic/p1.jpg" alt="Flowers" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 9">
+        <div class="tilt-inner">
+          <img src="pic/p8.jpg" alt="River" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 10">
+        <div class="tilt-inner">
+          <img src="pic/p13.jpg" alt="Snow" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 11">
+        <div class="tilt-inner">
+          <img src="pic/p15.jpg" alt="Sunset" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 12">
+        <div class="tilt-inner">
+          <img src="pic/p11.jpg" alt="Stars" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 13">
+        <div class="tilt-inner">
+          <img src="pic/p7.jpg" alt="Ocean" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 14">
+        <div class="tilt-inner">
+          <img src="pic/p16.jpg" alt="City Day" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 15">
+        <div class="tilt-inner">
+          <img src="pic/p22.jpg" alt="Lake" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 16">
+        <div class="tilt-inner">
+          <img src="pic/p10.jpg" alt="Bridge" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 17">
+        <div class="tilt-inner">
+          <img src="pic/p14.jpg" alt="Canyon" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 18">
+        <div class="tilt-inner">
+          <img src="pic/p9.jpg" alt="Waterfall" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 19">
+        <div class="tilt-inner">
+          <img src="pic/p12.jpg" alt="Valley" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-right" tabindex="0" aria-label="Gallery image 20">
+        <div class="tilt-inner">
+          <img src="pic/p4.jpg" alt="Garden" loading="lazy" />
+        </div>
+      </div>
+      <!-- pic 21 -->
+       <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 7">
+        <div class="tilt-inner">
+          <img src="pic/p5.jpg" alt="Desert" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 7">
+        <div class="tilt-inner">
+          <img src="pic/p25.jpg" alt="Desert" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 7">
+        <div class="tilt-inner">
+          <img src="pic/p20.jpg" alt="Desert" loading="lazy" />
+        </div>
+      </div>
+      <div class="tilt tilt-left" tabindex="0" aria-label="Gallery image 7">
+        <div class="tilt-inner">
+          <img src="pic/p26.jpg" alt="Desert" loading="lazy" />
+        </div>
+      </div>
+    </section>
+  </main>
+
+<!-- Footer -->
+    <footer class="py-8 px-6 text-center"
+        style="background-color: var(--primary); border-top: 2px solid var(--accent);">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="https://www.linkedin.com/in/shantanu-raut-713b93261/" target="_blank" class="text-2xl"
+                    style="color: var(--text-secondary);"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://github.com/S-R-GITHUB" target="_blank" class="text-2xl"
+                    style="color: var(--text-secondary);"><i class="fab fa-github"></i></a>
+                <a href="https://x.com/TheShanLife" target="_blank" class="text-2xl"
+                    style="color: var(--text-secondary);"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.instagram.com/thesunlife.91?utm_source=qr" target="_blank" class="text-2xl"
+                    style="color: var(--text-secondary);"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p class="mb-4" style="color: var(--text-secondary);">Designed & Built by Shantanu Raut</p>
+            <p style="color: var(--text-secondary); font-size: 0.8rem;">2025 © Shantanu Raut_Portfolio. All Rights
+                Reserved</p>
+        </div>
+    </footer>
+
+  <!-- JavaScript for 3D tilt effect, theme toggle, and mobile menu -->
+  <script>
+    // 3D Tilt effect with mouse movement
+    const tiltElements = document.querySelectorAll('.tilt');
+
+    tiltElements.forEach(el => {
+      const inner = el.querySelector('.tilt-inner');
+
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * 5;
+        const rotateY = ((x - centerX) / centerX) * 5;
+
+        // Add subtle movement on top of the hover rotation
+        const baseTransform = inner.style.transform.split(' ')[0] || '';
+        inner.style.transform = `${baseTransform} rotateX(${-rotateX}deg) rotateY(${rotateY}deg) translateZ(5px)`;
+      });
+
+      el.addEventListener('mouseleave', () => {
+        // Reset to only the base hover state (but keep the direction class transform)
+        const isLeft = el.classList.contains('tilt-left');
+        inner.style.transform = isLeft ? 
+          'rotateY(15deg) rotateX(-8deg) translateZ(20px)' : 
+          'rotateY(-15deg) rotateX(-8deg) translateZ(20px)';
+      });
+
+      el.addEventListener('mouseenter', () => {
+        // Reset any mouse movement transforms to start fresh
+        const isLeft = el.classList.contains('tilt-left');
+        inner.style.transform = isLeft ? 
+          'rotateY(15deg) rotateX(-8deg) translateZ(20px)' : 
+          'rotateY(-15deg) rotateX(-8deg) translateZ(20px)';
+      });
+
+      // Accessibility: add focus styles
+      el.addEventListener('focus', () => {
+        el.style.outline = `2px solid var(--accent)`;
+        el.style.outlineOffset = '4px';
+      });
+
+      el.addEventListener('focusout', () => {
+        el.style.outline = 'none';
+        // Reset transforms on focus out
+        const isLeft = el.classList.contains('tilt-left');
+        inner.style.transform = isLeft ? 
+          'rotateY(15deg) rotateX(-8deg) translateZ(20px)' : 
+          'rotateY(-15deg) rotateX(-8deg) translateZ(20px)';
+      });
+    });
+
+    // Theme toggle
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const htmlEl = document.documentElement;
+
+    function setTheme(isLight) {
+      if (isLight) {
+        htmlEl.classList.add('light-theme');
+        themeToggleBtn.textContent = '🌞';
+      } else {
+        htmlEl.classList.remove('light-theme');
+        themeToggleBtn.textContent = '🌙';
+      }
+      // Update explicit styles
+      document.body.style.backgroundColor = getComputedStyle(htmlEl).getPropertyValue('--primary');
+      document.body.style.color = getComputedStyle(htmlEl).getPropertyValue('--text-primary');
+    }
+
+    // Initialize theme based on localStorage or default dark
+    let isLightTheme = localStorage.getItem('theme') === 'light';
+    setTheme(isLightTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      isLightTheme = !isLightTheme;
+      localStorage.setItem('theme', isLightTheme ? 'light' : 'dark');
+      setTheme(isLightTheme);
+    });
+
+    // Mobile menu toggle
+    const mobileMenuBtn = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+      mobileMenuBtn.innerHTML = isOpen ? '&#10005;' : '&#9776;';
+    });
+
+    // Close mobile menu when clicking a link or outside menu
+    document.addEventListener('click', (e) => {
+      const target = e.target;
+      if (!mobileMenu.contains(target) && target !== mobileMenuBtn) {
+        if (mobileMenu.classList.contains('open')) {
+          mobileMenu.classList.remove('open');
+          mobileMenuBtn.setAttribute('aria-expanded', false);
+          mobileMenuBtn.innerHTML = '&#9776;';
+        }
+      }
+    });
+
+    // Close mobile menu on link click
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuBtn.setAttribute('aria-expanded', false);
+        mobileMenuBtn.innerHTML = '&#9776;';
+      });
+    });
+  </script>
+   <!-- preloder -->
+    <script>
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                document.body.classList.add("loaded");
+            }, 2000); // keeps animation visible at least 2s
+        });
+    </script>
+</body>
+</html>
