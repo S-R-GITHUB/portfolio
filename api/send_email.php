@@ -2,7 +2,13 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require 'phpmailer/vendor/autoload.php';
+require __DIR__ . '/../phpmailer/vendor/autoload.php';
+
+// Load .env
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = htmlspecialchars(trim($_POST['name'] ?? 'Anonymous'));
@@ -12,21 +18,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $mail = new PHPMailer(true);
 
     try {
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com';
-        $mail->SMTPAuth = true;
-        $mail->Username = 'airmarket24x7@gmail.com';  
-        $mail->Password = 'xplp mexz zjgx qnyw';   // Gmail App Password
-        $mail->SMTPSecure = 'tls';
-        $mail->Port = 587;
+        // Enable verbose debug logging
+        $mail->SMTPDebug = 2;
+        $mail->Debugoutput = 'error_log';
 
-        $mail->setFrom('airmarket24x7@gmail.com', 'Portfolio Contact Form');
-        $mail->addAddress('airmarket24x7@gmail.com');
+        $mail->isSMTP();
+        $mail->Host       = $_ENV['MAIL_HOST'] ?? 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $_ENV['MAIL_USERNAME'] ?? '';
+        $mail->Password   = $_ENV['MAIL_PASSWORD'] ?? '';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = (int)($_ENV['MAIL_PORT'] ?? 587);
+
+        // Sender & Recipient
+        $fromEmail = $_ENV['MAIL_FROM'] ?? 'fallback@example.com';
+        $fromName  = $_ENV['MAIL_FROM_NAME'] ?? 'Portfolio Contact Form';
+        $toEmail   = $_ENV['MAIL_TO'] ?? 'fallback@example.com';
+
+        $mail->setFrom($fromEmail, $fromName);
+        $mail->addAddress($toEmail);
 
         if (!empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $mail->addReplyTo($email, $name);
         }
 
+        // Email Content
         $mail->isHTML(true);
         $mail->Subject = "New message from $name via portfolio contact form";
         $mail->Body    = "
@@ -39,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $mail->send();
 
-        header("Location: thank-you.html");
+        header("Location: /thank-you.html");
         exit;
 
     } catch (Exception $e) {
@@ -49,4 +65,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 } else {
     echo "Invalid request method.";
 }
-?>

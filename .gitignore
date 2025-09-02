@@ -1,0 +1,19 @@
+# Ignore PHPMailer vendor files (they will be installed fresh in Vercel)
+phpmailer/vendor/
+
+# Ignore Composer local cache
+composer.lock
+composer.phar
+
+# Ignore environment file (VERY IMPORTANT, don’t leak secrets)
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Node / frontend (if you add build tools later)
+node_modules/
