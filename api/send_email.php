@@ -6,9 +6,11 @@ require __DIR__ . '/../vendor/autoload.php';
 
 // Load .env
 use Dotenv\Dotenv;
-
-$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+if (file_exists(__DIR__ . '/../.env')) {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
+}
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = htmlspecialchars(trim($_POST['name'] ?? 'Anonymous'));
