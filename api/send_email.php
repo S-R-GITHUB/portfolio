@@ -2,7 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require __DIR__ . '/../phpmailer/vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 // Load .env
 use Dotenv\Dotenv;

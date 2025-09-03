@@ -1,5 +1,5 @@
 # Ignore PHPMailer vendor files (they will be installed fresh in Vercel)
-phpmailer/vendor/
+# phpmailer/vendor/
 
 # Ignore Composer local cache
 composer.lock
